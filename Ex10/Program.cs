@@ -4,96 +4,210 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Exercicio10
+namespace Ex18
 {
-
-    // Enquanto não fim de frase
-    // 	Enquanto não fim de palavra
-    // 		Empilha caractere na pilha
-    // 		Incrementa o passo
-    // 	Fim enquanto
-    // 	
-    // 	Enquanto pilha não vazia
-    // 		Remove um caractere da pilha
-    // 		Concatena o caractere removido na nova frase
-    // 	Fim enquanto
-    // 	
-    // 	Concatena espaço vazio na nova frase
-    // 	Incrementa o passo
-    // Fim enquanto
-
-    public class Program
+    class Program
     {
-        const int MAX = 20;
-        static void Insere(char[] p, ref int t, char n)
+        class tp_no // Classe principal que terá ponteiro, prox, dados etc.
         {
-            p[t] = n;
-            t++;
+            public string nome, sexo;
+            public int idade;
+            public tp_no prox;
         }
-        static char Remove(char[] p, ref int t)
-        {
-            t--;
-            return (p[t]);
-        }
-        static bool EstaVazia(int t)
-        {
-            if (t == 0)
-                return true;
-            else
-                return false;
-        }
-        static bool EstaCheia(int t)
-        {
-            if (t == MAX)
-                return true;
-            else
-                return false;
-        }
-        public static void Main(string[] args)
-        {
-            Console.WriteLine("\n" +
-            "--------------------------------------\n" +
-            "---- Programa para inverter nomes ----\n" +
-            "--------------------------------------\n");
 
-            char[] pilha = new char[MAX];
-            int topo = 0;
-			int i= 0;
-            Console.WriteLine("Escreva seu nome completo (por favor use somente letras e espaços):");
-            string nome = Console.ReadLine();
-            string invert = "";
-            int tam = nome.Length;
+        static void inserir(ref tp_no t, string nome, int idade, string sexo)
+        {
+            tp_no no = new tp_no(); // Instanciar a classe principal como variável "no".
+            no.nome = nome;
+            no.idade = idade;
+            no.sexo = sexo;
+            if (t != null)
+                no.prox = t;
+            t = no;
+        }
 
-            while (i < tam)
+        static void excluir(ref tp_no t)
+        {
+            string n; // Variável que receberá o nome a ser pesquisado.
+            char yesno; // Variável de string única (char) para confirmar (ou não) a exclusão.
+            tp_no atual, ant; // Variáveis declaradas como tp_no para tbm poderem ter ponteiros (prox).
+            ant = atual = null;
+            
+            Console.WriteLine("Nome para procurar: ");
+            n = Console.ReadLine();
+            
+            consultar(t, n, ref ant, ref atual); // Chama a função que procura o nome.
+            
+            if (atual != null)
             {
-                if (nome[i] != ' ')
+                Console.WriteLine("Nome encontrado. Deseja realmente excluir? (S/N)");
+                yesno = char.Parse(Console.ReadLine());
+
+                if (yesno == 'S' || yesno == 's') // Condição para exclusão (ou não) do registro.
                 {
-                    Insere(pilha, ref topo, nome[i]);
-					i++;
-                }
-                else if(nome[i] == ' ')
-                {
-					while (!EstaVazia(topo))
+                    if (atual == t)
                     {
-                        char c = Remove(pilha, ref topo);
-                        invert += c;
+                        t = atual.prox;
+                        atual.prox = null;
                     }
-                    invert += ' ';
-                    i++;
-				}
-            }
+                    else if (atual.prox == null)
+                    {
+                        ant.prox = null;
+                    }
+                    else
+                    {
+                        ant.prox = atual.prox;
+                        atual.prox = null;
+                    }
 
-            if (i == tam)
-            {
-                while(!EstaVazia(topo))
-                {
-                    char c = Remove(pilha, ref topo);
-                    invert += c;
+                    Console.WriteLine("Registro de " + n + " excluído.");
                 }
+                else
+                {
+                    Console.WriteLine("Registro não excluído.");
+                }
+            }
+            else
+            {
+                Console.WriteLine("Nome não encontrado.");
+            }
+        }
+
+        static void alterar(tp_no t)
+        {
+            string n; // Variável que receberá o nome a ser pesquisado.
+            tp_no atual, ant; // Variáveis declaradas como tp_no para tbm poderem ter ponteiros (prox).
+            ant = atual = null;
+
+            Console.WriteLine("Nome para procurar: ");
+            n = Console.ReadLine();
+            
+            consultar(t, n, ref ant, ref atual);
+
+            if (atual != null)
+            {
+                Console.WriteLine("Dados atuais" +
+                    "\nNome" + atual.nome +
+                    "\nIdade" + atual.idade +
+                    "\nSexo" + atual.sexo + ".");
+                
+                Console.WriteLine("\nNovos dados:");
+
+                Console.WriteLine("Nome");
+                atual.nome = Console.ReadLine();
+
+                Console.WriteLine("Idade");
+                atual.idade = int.Parse(Console.ReadLine());
+
+                Console.WriteLine("Sexo");
+                atual.sexo = Console.ReadLine();
+            }
+            else
+            {
+                Console.WriteLine("Não encontrado.");
+            }
+        }
+
+        static void consultar(tp_no t, string n, ref tp_no ant, ref tp_no atual)
+        {
+            ant = null;
+            atual = t;
+            while (atual != null && atual.nome != n)
+            {
+                ant = atual;
+                atual = atual.prox;
+            }
+        }
+
+        static void exibir(tp_no t)
+        {
+            tp_no mostrar = t;
+            int i = 1;
+            while (mostrar != null)
+            {
+                Console.WriteLine("\nRegistro " + i + ":" +
+                    "\nNome: " + mostrar.nome + "." +
+                    "\nIdade: " + mostrar.idade + "." +
+                    "\nSexo: " + mostrar.sexo + ".");
+                
+                mostrar = mostrar.prox;
                 i++;
             }
+        }        
+        
+        static void Main(string[] args)
+        {
+            tp_no topo = null;
+            int op = 0, idade, qtde;
+            string nome, sexo;
 
-			Console.WriteLine("\nO nome \"{0}\" invertido é: {1}.", nome, invert);
+            while (op != 5)
+            {
+                Console.WriteLine("\nPressione Enter para prosseguir...");
+                Console.ReadKey();
+                Console.Clear();
+
+                Console.WriteLine("\n" +
+                "---- MENU PRINCIPAL ----");
+            
+                Console.WriteLine("\nDigite a opção desejada:" +
+                    "\n1. Cadastrar." + // inserir()
+                    "\n2. Alterar." +   // a
+                    "\n3. Exibir." +   // excluir()
+                    "\n4. Excluir." +    // consultar()
+                    "\n5. Sair." +
+                    "\n");
+                op = int.Parse(Console.ReadLine());
+                
+                if (op == 1)
+                {
+                    Console.WriteLine("\nQuantos nomes deseja cadastrar?");
+                    qtde = int.Parse(Console.ReadLine());
+
+                    while (qtde > 0)
+                    {
+                        //Console.Clear();
+
+                        Console.WriteLine("\nNome: ");
+                        nome = Console.ReadLine();
+
+                        Console.WriteLine("Idade: ");
+                        idade = int.Parse(Console.ReadLine());
+
+                        Console.WriteLine("Sexo (M/F): ");
+                        sexo = Console.ReadLine();
+
+                        inserir(ref topo, nome, idade, sexo);
+                        qtde--;
+                        
+                        //Console.Clear();
+                    }
+                }
+                
+                else if (op == 2)
+                {
+                    alterar(topo);
+                }
+                
+                else if (op == 3)
+                {
+                    exibir(topo);
+
+                }
+                
+                else if (op == 4)
+                {
+                    excluir(ref topo);
+                }
+
+                else
+                {
+                    // Console.WriteLine("\nOpção inválida. Por favor digite um número de 1 a 5.");
+                    Console.WriteLine("Término da execução do programa.");
+                    Console.WriteLine("Pressione Enter para sair...");
+                    Console.ReadKey();
+                }
+            }
         }
     }
 }

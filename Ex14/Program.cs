@@ -4,107 +4,128 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Exercicio14
+namespace Ex22
 {
-    public class Program
+    class Program
     {
-        const int MAX = 20;
-
-        static void Insere(int[] q, ref int f, int v)
+        // 22) Implemente a lógica de uma lista encadeada com o conceito de fila, ou seja,
+        // insira os nós no fim da lista e remova-os do início da lista.
+        // ************************** Utilize duas variáveis (inicio e fim) para controlar os acessos a lista. **************************
+        class tp_no
         {
-            q[f] = v;
+            public string dino;
+            public tp_no prox;
+        }
+
+        static void inserir(ref tp_no item1, string dino, ref int f)
+        {
+            tp_no no = new tp_no();
+            no.dino = dino;
+            if (item1 != null) {
+                no.prox = item1;
+            }
+            item1 = no;
             f++;
         }
 
-        static int Remove(int[] q, ref int i)
+        static void exibir(tp_no item1)
         {
-            return (q[i++]);
-        }
-
-
-        static bool EstaVazia(int i, int f)
-        {
-            if (i == f)
-                return true;
-            else
-                return false;
-        }
-
-        static bool EstaCheia(int f)
-        {
-            if (f == MAX)
-                return true;
-            else
-                return false;
-        }
-
-
-        public static void Main(string[] args)
-        {
-            Console.WriteLine("\n" +
-            "---------------------------------------\n" +
-            "---- Programa para inserir números ----\n" +
-            "---------------------------------------\n");
-
-            int[] fila = new int[MAX];
-            int inicio = 0, fim = 0, num = 0, a = 0;
-
-            Console.WriteLine("Insira alguns números ou \"0\" para parar:");
-            string aux = Console.ReadLine();
-            num = int.Parse(aux);
-            int maior = num, menor = num;
-
-            while (num != 0)
+            tp_no mostrar = item1;
+            
+            while (mostrar != null)
             {
-                if (!EstaCheia(fim))
-                {
-                    if (num > maior)
-                    {
-                        maior = num;
-                    }
-                    else if (num < menor)
-                    {
-                        menor = num;
-                    }
-
-                    Insere(fila, ref fim, num);
-                    a++;
-                }
-                string aux1 = Console.ReadLine();
-                num = int.Parse(aux1);
+                Console.WriteLine("– " + char.ToUpper(mostrar.dino[0]) + mostrar.dino.Substring(1).ToLower() + ".");
+                
+                mostrar = mostrar.prox;
             }
-            if (num == 0)
+        }
+
+        static void consultar(tp_no item1, ref tp_no ant, ref tp_no atual, int f)
+        {
+            ant = null;
+            atual = item1;
+            
+            // while (atual.prox != null)
+            // {
+            //     ant = atual;
+            //     atual = atual.prox;
+            // }
+            for (int i = 1; i < f; i++)
             {
-                Console.WriteLine("Obrigado.");
+                ant = atual;
+                atual = atual.prox;
             }
+        }
 
-            int aux2 = 0, soma = 0;
-            float media = 0;
-
-            Console.Write("\nNúmeros informados: ");
-            while (a > 0)
+        static void excluir(ref tp_no item1, ref int i, int f)
+        {
+            tp_no atual, ant;
+            ant = atual = null;
+            
+            consultar(item1, ref ant, ref atual, f);
+            
+            if (atual != null && atual.prox == null)
             {
-                aux2 = Remove(fila, ref inicio);
-                Console.Write(aux2);
-                soma += aux2;
-                a--;
-                if (a > 0)
-                {
-                    Console.Write(", ");
+                ant.prox = null;
+                i++;
+            }
+            
+            else
+            {
+                Console.WriteLine("Dinossauro não encontrado.");
+            }
+        }
+        
+        static void Main(string[] args)
+        {
+            tp_no item1 = null;
+            string dino;
+            int inicio = 0, fim = 0;
+
+            Console.WriteLine("\nQuantos dinossauros deseja cadastrar?");
+            int max = int.Parse(Console.ReadLine());
+
+            if (max > 0)
+            {
+                for (int i = 0, j = 1; i < max; i++, j++) {
+                    Console.WriteLine("\n" + j + "º dinossauro: ");
+                    dino = Console.ReadLine();
+
+                    inserir(ref item1, dino, ref fim);
                 }
+
+                Console.Write("\nDinossauros cadastrados: \n");
+                exibir(item1);
+
+                Console.WriteLine("\nDeseja excluir um dinossauro? (S/N)");
+                char yesno = char.Parse(Console.ReadLine());
+
+                if (yesno == 's' || yesno == 'S')
+                {
+                    excluir(ref item1, ref inicio, fim);
+
+                    Console.WriteLine("\nDinossauro mais antigo excluído:");
+                    Console.WriteLine("\nDinossauros restantes:");
+                    exibir(item1);
+
+                    Console.WriteLine("\nTérmino da execução do programa (pressione Enter para sair)...");
+                    Console.ReadKey();
+                }
+
                 else
                 {
-                    Console.Write(".");
+                    Console.WriteLine("\nTérmino da execução do programa (pressione Enter para sair)...");
+                    Console.ReadKey();
                 }
             }
 
-            media = soma / fim;
-
-            Console.WriteLine("\nMédia aritmética: {0}.", media);
-            Console.WriteLine("Maior número: {0}.", maior);
-            Console.WriteLine("Menor número: {0}.", menor);
-
-            Console.WriteLine("\nTérmino da execução do programa........\n");
+            else
+            {
+                Console.WriteLine("\nAí você me quebra né meu parceiro..." +
+                    "\nComece novamente e digite um número maior que 0." +
+                    "\n" +
+                    "\nTérmino da execução do programa.");
+            }
         }
     }
 }
